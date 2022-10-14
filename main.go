@@ -15,19 +15,11 @@ func main() {
 	a := app.New()
 	w := a.NewWindow("Jiggle")
 
-	w.Resize(fyne.NewSize(300, 150))
-
-	// TODO: Improve UX.
-	// Disable 'startBtn' while the mouse is moving.
-	var startBtn *widget.Button
-	// Remove 'stopBtn'.
-	var stopBtn *widget.Button
-
 	stop := make(chan bool)
 
+	var startBtn *widget.Button
 	startBtn = widget.NewButton("Start", func() {
-		w.SetContent(stopBtn)
-
+		startBtn.Disable()
 		robot.Move(startX, centerY)
 
 		go func() {
@@ -38,7 +30,7 @@ func main() {
 				default:
 					// TODO: Stop mouse movement with a keyboard event instead.
 					if _, y := robot.GetMousePos(); y != centerY {
-						w.SetContent(startBtn)
+						startBtn.Enable()
 						stop <- true
 					}
 
@@ -53,11 +45,7 @@ func main() {
 		}()
 	})
 
-	stopBtn = widget.NewButton("Stop", func() {
-		w.SetContent(startBtn)
-		stop <- true
-	})
-
+	w.Resize(fyne.NewSize(300, 150))
 	w.SetContent(startBtn)
 	w.ShowAndRun()
 }
