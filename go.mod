@@ -1,4 +1,4 @@
-module mouse_mover
+module github.com/mcecode/jiggle
 
 go 1.19
 
