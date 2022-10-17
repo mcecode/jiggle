@@ -1,6 +1,8 @@
 package main
 
 import (
+	"sync/atomic"
+
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
@@ -18,7 +20,8 @@ var (
 )
 
 func main() {
-	stop := make(chan bool)
+	// 0 means false and 1 means true.
+	var stop uint32 = 1
 
 	a := app.New()
 	w := a.NewWindow("Jiggle")
@@ -42,18 +45,20 @@ func main() {
 		robot.Move(startX, startY)
 
 		go func() {
+			atomic.StoreUint32(&stop, 0)
+
 			for {
-				select {
-				case <-stop:
+				if atomic.LoadUint32(&stop) == 1 {
+					atomic.StoreUint32(&stop, 0)
 					return
-				default:
-					// TODO: Control speed and distace traveled using user input.
-					// TODO: Move mouse throughout the screen, not just in one line.
-					robot.MoveSmoothRelative(-200, 0)
-					robot.MilliSleep(100)
-					robot.MoveSmoothRelative(200, 0)
-					robot.MilliSleep(100)
 				}
+
+				// TODO: Control speed and distace traveled using user input.
+				// TODO: Move mouse throughout the screen, not just in one line.
+				robot.MoveSmoothRelative(-200, 0)
+				robot.MilliSleep(100)
+				robot.MoveSmoothRelative(200, 0)
+				robot.MilliSleep(100)
 			}
 		}()
 	})
@@ -71,10 +76,11 @@ func main() {
 	w.Resize(fyne.NewSize(300, 150))
 	w.SetFixedSize(true)
 
-	// TODO: Fix multiple key press bug.
 	go func() {
 		hook.Register(hook.KeyDown, []string{"*"}, func(e hook.Event) {
-			stop <- true
+			if atomic.LoadUint32(&stop) == 0 {
+				atomic.StoreUint32(&stop, 1)
+			}
 
 			startBtn.Enable()
 			status.Set("Stopped")
