@@ -17,8 +17,6 @@ import (
 
 var sx, sy = robot.GetScreenSize()
 
-// TODO: Add error handling.
-
 func main() {
 	// 0 means false and 1 means true.
 	var stop uint32 = 1
@@ -42,15 +40,17 @@ func main() {
 		status.Set("Started")
 		instruct.Set("Press any key once to stop")
 
-		go func() {
-			atomic.StoreUint32(&stop, 0)
+		atomic.StoreUint32(&stop, 0)
 
+		go func() {
 			for {
 				if atomic.LoadUint32(&stop) == 1 {
-					atomic.StoreUint32(&stop, 0)
+					status.Set("Stopped")
+					startBtn.Enable()
 					return
 				}
 
+				// TODO: Add error handling.
 				x, _ := rand.Int(rand.Reader, big.NewInt(int64(sx)))
 				y, _ := rand.Int(rand.Reader, big.NewInt(int64(sy)))
 
@@ -76,11 +76,9 @@ func main() {
 		hook.Register(hook.KeyDown, []string{"*"}, func(e hook.Event) {
 			if atomic.LoadUint32(&stop) == 0 {
 				atomic.StoreUint32(&stop, 1)
+				status.Set("Stopping")
+				instruct.Set("")
 			}
-
-			startBtn.Enable()
-			status.Set("Stopped")
-			instruct.Set("")
 		})
 
 		<-hook.Process(hook.Start())
