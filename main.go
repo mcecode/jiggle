@@ -1,6 +1,8 @@
 package main
 
 import (
+	"crypto/rand"
+	"math/big"
 	"sync/atomic"
 
 	"fyne.io/fyne/v2"
@@ -13,11 +15,9 @@ import (
 	hook "github.com/robotn/gohook"
 )
 
-var (
-	sx, sy = robot.GetScreenSize()
-	startX = sx/2 + 100
-	startY = sy / 2
-)
+var sx, sy = robot.GetScreenSize()
+
+// TODO: Add error handling.
 
 func main() {
 	// 0 means false and 1 means true.
@@ -42,8 +42,6 @@ func main() {
 		status.Set("Started")
 		instruct.Set("Press any key once to stop")
 
-		robot.Move(startX, startY)
-
 		go func() {
 			atomic.StoreUint32(&stop, 0)
 
@@ -53,12 +51,10 @@ func main() {
 					return
 				}
 
-				// TODO: Control speed and distace traveled using user input.
-				// TODO: Move mouse throughout the screen, not just in one line.
-				robot.MoveSmoothRelative(-200, 0)
-				robot.MilliSleep(100)
-				robot.MoveSmoothRelative(200, 0)
-				robot.MilliSleep(100)
+				x, _ := rand.Int(rand.Reader, big.NewInt(int64(sx)))
+				y, _ := rand.Int(rand.Reader, big.NewInt(int64(sy)))
+
+				robot.MoveSmooth(int(x.Int64()), int(y.Int64()))
 			}
 		}()
 	})
