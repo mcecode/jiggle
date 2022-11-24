@@ -19,19 +19,28 @@ fynecmd="fyne package -name jiggle -icon assets/cursor.png"
 os=$(uname -s | tr "[:upper:]" "[:lower:]")
 case "$os" in
   "cygwin"*|"mingw"*|"msys"*|"windows"*)
-    echo "Creating jiggle.exe"
+    j="jiggle.exe"
+
+    echo "Creating $j"
     $fynecmd -os windows -- -ldflags -H=windowsgui
-    mv jiggle.exe build/jiggle.exe
+    mv $j build/$j
   ;;
   "darwin"*)
-    echo "Creating jiggle.app"
+    j="jiggle.app"
+
+    echo "Creating $j"
     $fynecmd -os darwin
-    mv jiggle.app build/jiggle.app
+    mv $j build/$j
   ;;
   "linux"*|*"bsd"*)
-    echo "Creating tmp-pkg"
+    j="jiggle.tar.xz"
+
+    echo "Creating $j"
     $fynecmd -os linux
-    mv tmp-pkg build/tmp-pkg
+    mv $j build/$j
+    cd build
+    echo "Extracting $j"
+    tar -xJf $j
   ;;
   *)
     echo "Error: '$os' OS is not supported." >&2
