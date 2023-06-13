@@ -2,7 +2,7 @@
 
 An application that automatically moves your mouse around which _should_\* keep your machine awake.
 
-![A demo showing Jiggle being started, moving the mouse, and finally being stopped.](assets/demo.gif)
+![A demo showing Jiggle being started, moving the mouse, and finally being stopped by a keypress.](assets/demo.webp)
 
 \*Should because I haven't actually tested if it can keep a machine awake long term because I don't really need to do that, and the friend that I made this for ended up buying a USB [mouse jiggler](https://en.wikipedia.org/wiki/Mouse_jiggler) before I could finish this, so she wasn't able to test it either. So yeah, it was a good learning experience in Go though.
 
